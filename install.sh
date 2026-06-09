@@ -19,7 +19,12 @@ API_BASE="https://api.github.com/repos/${REPO}"
 VERSION="${VERSION:-latest}"
 
 # Installation directory
-INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
+# Default to /usr/local/bin for system-wide install, or ~/.local/bin for user-level
+if [ "$EUID" -eq 0 ]; then
+    INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
+else
+    INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
+fi
 
 # Binary name
 BINARY_NAME="gvu"
