@@ -249,8 +249,6 @@ gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
 
 # 3. Point your domain's DNS to the service
 #    go.mycompany.com  CNAME  gomodvanityurls.com
-
-# 4. TLS certificate is provisioned automatically (Caddy On-Demand TLS)
 ```
 
 The CLI probes the route after creation and warns you if TLS is still provisioning.
@@ -364,10 +362,5 @@ gvu add gomod.io/mylib $REPO_URL --json --yes
 
 ## Support
 
-- **Source code**: [github.com/bigwhite/gomodvanityurls](https://github.com/bigwhite/gomodvanityurls)
-- **Issues**: `gvu issue` or [GitHub Issues](https://github.com/bigwhite/gomodvanityurls/issues)
+- **Issues**: `gvu issue` or [GitHub Issues](https://github.com/gomodvanityurls/gvu/issues)
 - **Donate**: `gvu donate`
-
-## License
-
-This project is open source. See the [source repository](https://github.com/bigwhite/gomodvanityurls) for license details.

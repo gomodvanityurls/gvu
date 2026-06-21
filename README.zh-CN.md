@@ -249,8 +249,6 @@ gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
 
 # 3. 配置 DNS，将域名指向服务端
 #    go.mycompany.com  CNAME  gomodvanityurls.com
-
-# 4. TLS 证书自动签发（Caddy On-Demand TLS）
 ```
 
 CLI 会在路由创建后自动探测 TLS 状态，如证书仍在签发中会给出提示。
@@ -364,10 +362,5 @@ gvu add gomod.io/mylib $REPO_URL --json --yes
 
 ## 支持
 
-- **源码仓库**：[github.com/bigwhite/gomodvanityurls](https://github.com/bigwhite/gomodvanityurls)
-- **问题反馈**：`gvu issue` 或 [GitHub Issues](https://github.com/bigwhite/gomodvanityurls/issues)
+- **问题反馈**：`gvu issue` 或 [GitHub Issues](https://github.com/gomodvanityurls/gvu/issues)
 - **捐赠支持**：`gvu donate`
-
-## 许可证
-
-本项目为开源项目，详见 [源码仓库](https://github.com/bigwhite/gomodvanityurls) 中的许可证文件。
