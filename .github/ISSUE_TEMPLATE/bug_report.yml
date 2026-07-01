@@ -1,0 +1,64 @@
+name: "🐛 Bug Report"
+description: "Report a bug in gvu CLI"
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: "gvu version"
+      description: "Run `gvu --version` to get this"
+      placeholder: "v0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: "Operating system"
+      options:
+        - Linux
+        - macOS
+        - Windows (PowerShell)
+        - Windows (Git Bash / WSL)
+    validations:
+      required: true
+
+  - type: input
+    id: go-version
+    attributes:
+      label: "Go version (optional)"
+      description: "Run `go version` to get this"
+      placeholder: "go1.25.0 linux/amd64"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "What happened?"
+      description: "A clear description of the bug"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Steps to reproduce"
+      description: "How can we reproduce this?"
+      placeholder: |
+        1. Run `gvu add ...`
+        2. See error ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Expected behavior"
+      description: "What did you expect to happen?"
+
+  - type: textarea
+    id: output
+    attributes:
+      label: "Command output (optional)"
+      description: "Paste any error messages or `--json` output here"
+      render: shell

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "📖 Documentation"
+    url: https://gomodvanityurls.com/docs/
+    about: "Check the docs first — many questions are already answered there."
+  - name: "💬 Discussions"
+    url: https://github.com/gomodvanityurls/gvu/discussions
+    about: "For usage questions, tips, and general discussion."
