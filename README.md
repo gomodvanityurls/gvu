@@ -41,6 +41,21 @@ Install a specific version:
 curl -fsSL https://gomodvanityurls.com/install.sh | VERSION=v0.0.1 bash
 ```
 
+### Windows
+
+**Option A — Scoop (PowerShell / CMD):**
+
+```powershell
+scoop bucket add gomodvanityurls https://github.com/gomodvanityurls/scoop-bucket
+scoop install gvu
+```
+
+**Option B — Git Bash / MSYS2 / WSL:**
+
+```bash
+curl -fsSL https://gomodvanityurls.com/install.sh | bash
+```
+
 ### Manual install
 
 Download the binary for your platform from the [latest release](https://github.com/gomodvanityurls/gvu/releases/latest):
@@ -54,13 +69,6 @@ Download the binary for your platform from the [latest release](https://github.c
 | macOS (Apple Silicon)| `gvu-darwin-arm64`        |
 | Windows (x86_64)     | `gvu-windows-amd64.exe`   |
 | Windows (ARM64)      | `gvu-windows-arm64.exe`   |
-
-```bash
-# Example: Linux x86_64
-wget https://github.com/gomodvanityurls/gvu/releases/latest/download/gvu-linux-amd64
-chmod +x gvu-linux-amd64
-sudo mv gvu-linux-amd64 /usr/local/bin/gvu
-```
 
 Verify checksums:
 
@@ -88,21 +96,36 @@ $ gvu add gomod.io/mylib https://github.com/myorg/mylib.git
 ═══════════════════════════════════════════════════════════
 ```
 
+An anonymous account is created automatically on first run — no signup required.
+
+**Monorepo with subdirectory (Go 1.25+):**
+
+If your repo contains multiple Go modules in subdirectories, use `--subdir`:
+
+```bash
+gvu add gomod.io/module-a https://github.com/myorg/monorepo.git --subdir go/module-a
+```
+
+The Go 1.25+ toolchain will clone the repo and read `go/module-a/go.mod`. On Go < 1.25 the `subdir` field is silently ignored (backward compatible).
+
 **Using a custom domain (requires Verified account):**
 
 ```bash
-$ gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
+# Step 1: Create an anonymous account (fast, no email required)
+gvu auth signup
 
-✔ Route created successfully!
-═══════════════════════════════════════════════════════════
-┃ Route ID:     m_def456
-┃ Vanity Path:  go.mycompany.com/mylib
-┃ Target Repo:  https://github.com/myorg/mylib.git
-┃ TLS:          ✔ Certificate provisioned
-═══════════════════════════════════════════════════════════
+# Step 2: Bind your email to upgrade to Verified
+gvu auth bind user@example.com
+# Enter the 6-digit code sent to your email
+
+# Step 3: Point your DNS (must be done before adding the route)
+# go.mycompany.com  CNAME  gomodvanityurls.com
+
+# Step 4: Add the custom domain route
+gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
 ```
 
-An anonymous account is created automatically on first run — no signup required. To use custom domains, [bind your email](#authentication) to upgrade to Verified.
+> **DNS must be configured first.** The server verifies the CNAME record during route creation. If the DNS is not yet configured, the command will fail with a `DNS_NOT_CONFIGURED` error.
 
 ### 2. Configure your Go environment
 
@@ -133,6 +156,16 @@ import "go.mycompany.com/mylib"
 
 That's it. The Go toolchain resolves the vanity path to your Git repo automatically.
 
+> **Important:** Your module's `go.mod` must declare the vanity URL as its module path — **not** the original repo URL.
+>
+> ```go
+> // go.mod — correct
+> module gomod.io/mylib
+>
+> // go.mod — WRONG (will cause import resolution failure)
+> module github.com/myorg/mylib
+> ```
+
 ---
 
 ## Commands
@@ -156,14 +189,16 @@ gvu add gomod.io/mylib https://gitlab.com/myorg/mylib.git
 gvu add gomod.io/mylib https://user@bitbucket.org/workspace/mylib.git
 gvu add gomod.io/mylib https://gitlab.example.com/group/mylib.git
 
-# Custom domain routes (requires Verified or Pro account)
+# Custom domain routes (requires Verified or Pro account; DNS must be configured first)
 gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
 gvu add go.mycompany.com/api   ssh://git@gitlab.example.com:2222/group/api.git
 
 # SSH URLs work with both gomod.io and custom domains
 gvu add gomod.io/mylib git@github.com:myorg/mylib.git
 gvu add gomod.io/mylib ssh://git@github.com/myorg/mylib.git
-gvu add gomod.io/mylib ssh://git@gitlab.example.com:2222/group/mylib.git
+
+# Monorepo with subdirectory (Go 1.25+)
+gvu add gomod.io/module-a https://github.com/myorg/monorepo.git --subdir go/module-a
 ```
 
 #### `gvu remove`
@@ -199,7 +234,7 @@ gvu remove m_abc123 m_def456 -y        # skip confirmation
 
 - **Anonymous**: Account is created automatically. 5 `gomod.io` routes. No email required.
 - **Verified**: Run `gvu auth bind <email>` and verify with a 6-digit OTP. 10 routes + 1 custom domain.
-- **Pro**: Subscription-based. 50 routes + 50 custom domains. *(Coming soon)*
+- **Pro**: Run `gvu subscribe` to subscribe. 50 routes + 50 custom domains + domain binding.
 
 #### Multi-device access
 
@@ -210,11 +245,28 @@ gvu auth login user@example.com
 # Enter the 6-digit code sent to your email
 ```
 
+### Subscription
+
+| Command | Description |
+|---------|-------------|
+| `gvu subscribe` | Subscribe to Pro plan |
+
+Pro plan pricing:
+
+| Period | CNY | USD |
+|--------|-----|-----|
+| Monthly | ¥9.9 | $3.99 |
+| Yearly | ¥79 | $29.99 |
+
+Payment methods: WeChat Pay, Alipay, PayPal.
+
+> **Windows users:** `gvu subscribe` automatically opens the payment QR code in your system image viewer.
+
 ### Other commands
 
 | Command | Description |
 |---------|-------------|
-| `gvu donate` | Show donation QR codes (WeChat Pay / Alipay) |
+| `gvu donate` | Show donation QR codes (WeChat Pay / Alipay / PayPal) |
 | `gvu issue` | Open a GitHub issue in your browser |
 | `gvu --version` | Show version info |
 
@@ -227,31 +279,44 @@ gvu auth login user@example.com
 | **`gomod.io` routes** | 5 | 10 | 50 |
 | **Custom domain routes** | 0 | 1 | 50 |
 | **Total routes** | 5 | 10 | 50 |
-| **Short paths (< 4 chars)** | No | Yes | Yes |
+| **Short paths (< 4 chars)** | No | No | Yes |
+| **Domain binding** | 0 | 0 | 50 |
 | **Multi-device** | No | Yes | Yes |
 
-All route types share a single quota pool. For example, a Verified user with 1 custom domain route has 9 remaining slots for `gomod.io` routes.
-
-> `gomod.io` is the platform's default domain — it works immediately without any DNS configuration. Custom domains require you to point a CNAME record to the service.
+- **`gomod.io`**: Platform-provided default domain, works out of the box
+- **Custom domain**: User-owned domain (e.g., `go.mycompany.com`), requires DNS CNAME configured before `gvu add`
+- **Short path**: First path segment < 4 characters (custom domains are exempt)
+- **Domain binding**: Pro users exclusively bind a domain — once bound, only that user can add routes under it
+- **Quota**: All route types share a single pool with per-type caps
 
 ---
 
 ## Custom domains
 
-Verified and Pro users can use their own domain as the vanity URL prefix:
+Verified and Pro users can use their own domain as the vanity URL prefix.
+
+### Setup steps
 
 ```bash
 # 1. Upgrade to Verified (if not already)
 gvu auth bind user@example.com
 
-# 2. Add a custom domain route
-gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
-
-# 3. Point your domain's DNS to the service
+# 2. Configure DNS first (required before adding the route)
 #    go.mycompany.com  CNAME  gomodvanityurls.com
+
+# 3. Add the custom domain route
+gvu add go.mycompany.com/mylib https://github.com/myorg/mylib.git
 ```
 
-The CLI probes the route after creation and warns you if TLS is still provisioning.
+> **DNS must be configured before `gvu add`.** The server verifies the CNAME record during route creation.
+
+### Domain binding (Pro only)
+
+Pro users get **exclusive domain binding**: when a Pro user adds a route under a new custom domain, that domain is automatically bound to them. Once bound, no other user can add routes under that domain.
+
+- Up to 50 domain bindings for Pro users
+- Verified users can use 1 custom domain but do not participate in binding
+- Binding is automatically removed if the Pro subscription expires and routes are cleaned up
 
 ---
 
@@ -295,12 +360,6 @@ $ gvu list --json
         "vanity_path": "gomod.io/mylib",
         "target_repo": "https://github.com/myorg/mylib.git",
         "repo_type": "github"
-      },
-      {
-        "id": "m_def456",
-        "vanity_path": "go.mycompany.com/api",
-        "target_repo": "https://github.com/myorg/api.git",
-        "repo_type": "github"
       }
     ]
   }
@@ -327,13 +386,16 @@ Make sure you've added the domain to `GOPRIVATE`:
 export GOPRIVATE=gomod.io,go.mycompany.com
 ```
 
+### Why must `go.mod` use the vanity URL instead of `github.com/...`?
+
+The Go toolchain uses the **import path** to locate the module. The `module` directive in `go.mod` must match the vanity URL exactly. If they don't match, `go get` and `go build` will fail.
+
 ### Can I use SSH URLs for private repos?
 
 Yes. `gvu` supports all standard SSH URL formats:
 
 ```bash
 gvu add gomod.io/mylib git@github.com:myorg/mylib.git
-gvu add gomod.io/mylib ssh://git@github.com/myorg/mylib.git
 gvu add go.mycompany.com/mylib ssh://git@gitlab.example.com:2222/group/mylib.git
 ```
 
@@ -358,9 +420,34 @@ Yes. Use `--json` for structured output and `--yes` to skip prompts:
 gvu add gomod.io/mylib $REPO_URL --json --yes
 ```
 
+### What happens if I add a custom domain route before configuring DNS?
+
+The command will fail with a `DNS_NOT_CONFIGURED` error. You must configure the CNAME record **before** running `gvu add` for custom domains:
+
+```
+go.mycompany.com  CNAME  gomodvanityurls.com
+```
+
+Wait for DNS propagation (usually a few minutes), then retry.
+
+---
+
+## Donate
+
+If you find `gvu` useful, consider buying me a coffee!
+
+**PayPal**: [![Donate with PayPal](https://img.shields.io/badge/Donate-PayPal-0070ba?logo=paypal&logoColor=white)](https://www.paypal.com/paypalme/tonybaicn)
+
+**WeChat Pay / Alipay**:
+
+<p float="left">
+  <img src="doc/donate/wechat-pay.png" alt="WeChat Pay" width="200"/>
+  <img src="doc/donate/alipay.png" alt="Alipay" width="200"/>
+</p>
+
 ---
 
 ## Support
 
 - **Issues**: `gvu issue` or [GitHub Issues](https://github.com/gomodvanityurls/gvu/issues)
-- **Donate**: `gvu donate`
+- **Website**: [gomodvanityurls.com](https://gomodvanityurls.com)
