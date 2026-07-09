@@ -43,17 +43,31 @@ curl -fsSL https://gomodvanityurls.com/install.sh | VERSION=v0.0.1 bash
 
 ### Windows
 
-**Option A — Scoop (PowerShell / CMD):**
+**Option A — PowerShell (recommended):**
 
 ```powershell
-scoop bucket add gomodvanityurls https://github.com/gomodvanityurls/scoop-bucket
-scoop install gvu
+powershell -ExecutionPolicy ByPass -c "irm https://gomodvanityurls.com/install.ps1 | iex"
+```
+
+The script auto-detects your architecture, verifies the download, and configures PATH.
+
+Install a specific version:
+
+```powershell
+$env:VERSION="v0.1.4"; powershell -ExecutionPolicy ByPass -c "irm https://gomodvanityurls.com/install.ps1 | iex"
 ```
 
 **Option B — Git Bash / MSYS2 / WSL:**
 
 ```bash
 curl -fsSL https://gomodvanityurls.com/install.sh | bash
+```
+
+**Option C — Scoop:**
+
+```powershell
+scoop bucket add gomodvanityurls https://github.com/gomodvanityurls/scoop-bucket
+scoop install gvu
 ```
 
 ### Manual install
